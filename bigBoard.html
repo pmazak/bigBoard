@@ -1,0 +1,148 @@
+<!-- By Paul Mazak.  Beta version 0.1. -->
+<html>
+<head>
+<style type="text/css">
+body {
+	margin: 4px
+}
+.drag {
+	position: relative;
+	cursor: pointer;
+	z-index: 100;
+	background-color: #FFFFDD;
+	border: 1px solid #000000;
+	width: 150px;
+	height: 150px;
+	overflow-x: hidden;
+	overflow-y: hidden;
+	font-weight: bold;
+}
+.edit {
+	position: relative;
+	cursor: pointer;
+	z-index: 100;
+	background-color: #DDFFDD;
+	border: 1px solid #000000;
+	width: 150px;
+	height: 150px;
+	overflow: auto;
+	font-weight: bold;
+}
+
+</style>
+	<script type="text/javascript" src="http://votehead.com/scripts/json.js"></script>
+	<script type="text/javascript" src="http://votehead.com/scripts/cookies.js"></script>
+
+<script type="text/javascript">
+/***********************************************
+* Drag and Drop Script: © Dynamic Drive (http://www.dynamicdrive.com)
+* This notice MUST stay intact for legal use
+* Visit http://www.dynamicdrive.com/ for this script and 100s more.
+***********************************************/
+var dragobject={
+	z: 0, x: 0, y: 0, offsetx : null, offsety : null, targetobj : null, dragapproved : 0,
+	initialize:function(){
+		document.onmousedown=this.drag
+		document.onmouseup=function(){this.dragapproved=0}
+	},
+	drag:function(e){
+		var evtobj=window.event? window.event : e
+		this.targetobj=window.event? event.srcElement : e.target
+		if (evtobj.ctrlKey==1 && evtobj.altKey==1) {
+			removePostIt(this.targetobj);
+		}
+		else if (evtobj.ctrlKey==1) {
+			this.targetobj.className=(this.targetobj.className=="drag" ? "edit" : "drag"); 
+		}
+		if (this.targetobj.className=="drag"){
+			this.dragapproved=1
+			if (isNaN(parseInt(this.targetobj.style.left))){this.targetobj.style.left=0}
+			if (isNaN(parseInt(this.targetobj.style.top))){this.targetobj.style.top=0}
+			this.offsetx=parseInt(this.targetobj.style.left)
+			this.offsety=parseInt(this.targetobj.style.top)
+			this.x=evtobj.clientX
+			this.y=evtobj.clientY
+			if (evtobj.preventDefault)
+				evtobj.preventDefault()
+			document.onmousemove=dragobject.moveit
+		}
+	},
+	moveit:function(e){
+		var evtobj=window.event? window.event : e
+		if (this.dragapproved==1){
+			this.targetobj.style.left=this.offsetx+evtobj.clientX-this.x+"px"
+			this.targetobj.style.top=this.offsety+evtobj.clientY-this.y+"px"
+			saveState(this.targetobj);
+			return false
+		}
+	}
+};
+
+dragobject.initialize();
+
+
+
+function removePostIt(elem)
+{
+	eraseCookie(elem.id);
+	elem.style.display = "none";
+}
+function newPostIt()
+{
+	var newPostIt = document.createElement("textarea");
+	newPostIt.id="a"+(new Date()).getTime();
+	newPostIt.className="drag";
+	newPostIt.value = "";
+	document.body.appendChild(newPostIt);
+	//TODO:needed?
+	allIds[allIds.length] = newPostIt.id;
+	saveState(newPostIt);
+}
+function saveState(elem)
+{
+	if (!elem.id)
+	{
+		return;
+	}
+	var cookieText = elem.style.left + COOKIE_DELIMITER + elem.style.top + COOKIE_DELIMITER + elem.value;	
+	createCookie(elem.id, cookieText, 999);
+}
+function loadState(id)
+{
+	var cookieText = readCookie(id);
+	if (cookieText)
+	{
+		var elem = document.createElement("textarea");
+		elem.id = id;
+		elem.className="drag";
+		var attributes = cookieText.split(COOKIE_DELIMITER);
+		elem.style.left=attributes[0];
+		elem.style.top=attributes[1];
+		elem.value=attributes[2] || "";
+		document.body.appendChild(elem);		
+	}
+}
+function save(e){
+	var evtobj=window.event? window.event : e
+	var targetobj=window.event? event.srcElement : e.target
+	saveState(targetobj);
+}
+
+document.onkeyup=save;
+</script>
+</head>
+<body>
+<table width="100%"><tr>
+<td width="33%"><a href="javascript:newPostIt()">new</a></td><td width="33%"><u>edit</u> = Ctrl+click</td><td width="33%"><u>delete</u> = Ctrl+Alt+click</td>
+</tr></table>
+<hr/>
+</body>
+<script type="text/javascript">
+var allIds = readCookieNames();
+for (var i=0; i<allIds.length; i++)
+{
+	loadState(allIds[i]);
+}
+</script>
+</html>
+
