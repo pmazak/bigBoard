@@ -11,8 +11,8 @@ body {
 	z-index: 100;
 	background-color: #FFFFDD;
 	border: 1px solid #000000;
-	width: 150px;
-	height: 150px;
+	width: 140px;
+	height: 50px;
 	overflow-x: hidden;
 	overflow-y: hidden;
 	font-weight: bold;
@@ -23,15 +23,21 @@ body {
 	z-index: 100;
 	background-color: #DDFFDD;
 	border: 1px solid #000000;
-	width: 150px;
-	height: 150px;
+	width: 140px;
+	height: 50px;
 	overflow: auto;
 	font-weight: bold;
 }
+.ladder {
+	float:right; width:400px;
+}
+.ladder div {
+	text-align:right; border:1px solid; line-height: 60px; font-size: 60px; width: 100%;
+}
 
 </style>
-    <script type="text/javascript" src="https://github.com/pmazak/bigBoard/raw/master/scripts/json.js"></script>
-    <script type="text/javascript" src="https://github.com/pmazak/bigBoard/raw/master/scripts/cookies.js"></script>
+    <script type="text/javascript" src="scripts/json.js"></script>
+    <script type="text/javascript" src="scripts/cookies.js"></script>
 
 <script type="text/javascript">
 /***********************************************
@@ -79,8 +85,7 @@ var dragobject={
 };
 
 dragobject.initialize();
-
-
+var allIds;
 
 function removePostIt(elem)
 {
@@ -110,6 +115,10 @@ function saveState(elem)
 function loadState(id)
 {
 	var cookieText = readCookie(id);
+	loadText(id, cookieText);
+}
+function loadText(id, cookieText) 
+{
 	if (cookieText)
 	{
 		var elem = document.createElement("textarea");
@@ -127,7 +136,36 @@ function save(e){
 	var targetobj=window.event? event.srcElement : e.target
 	saveState(targetobj);
 }
-
+function loadFromCookie() 
+{
+	allIds = readCookieNames();
+	for (var i=0; i<allIds.length; i++) {
+		loadState(allIds[i]);
+	}
+}
+function loadHardCoded() 
+{
+	allIds = [
+	"select a new car",
+	"go grocery shopping",
+	"cook dinner",
+	"do laundry",
+	"plant a garden",
+	"create a workout plan",
+	"knit a scarf",
+	"shop for new clothes",
+	"wash the car",
+	"walk the dog",
+	"make tea",
+	"sign up for a marathon",
+	"train for a marathon",
+	"run a marathon"
+	];
+	for (var i=0; i<allIds.length; i++) {
+		allIds[i]=i+COOKIE_DELIMITER+i+COOKIE_DELIMITER+allIds[i];
+		loadText("elem"+i, allIds[i]);
+	}
+}
 document.onkeyup=save;
 </script>
 </head>
@@ -136,12 +174,22 @@ document.onkeyup=save;
 <td width="33%"><a href="javascript:newPostIt()">new</a></td><td width="33%"><u>edit</u> = Ctrl+click</td><td width="33%"><u>delete</u> = Ctrl+Alt+click</td>
 </tr></table>
 <hr/>
-</body>
+<div class="ladder">
+     <div>1</div>
+     <div>2</div>
+     <div>3</div>
+     <div>5</div>
+     <div>8</div>
+     <div>13</div>
+     <div>20</div>
+     <div>
+	     <div style="float:right; width:49%">40</div>
+	     <div style="border: 2px outset black; float:left; width:49%">100</div>
+     </div>
+</div>
 <script type="text/javascript">
-var allIds = readCookieNames();
-for (var i=0; i<allIds.length; i++)
-{
-	loadState(allIds[i]);
-}
+//loadFromCookie();
+loadHardCoded();
 </script>
+</body>
 </html>
